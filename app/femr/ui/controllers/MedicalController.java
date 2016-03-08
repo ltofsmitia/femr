@@ -333,9 +333,7 @@ public class MedicalController extends Controller {
                 .collect(Collectors.toList());
 
         for (PrescriptionItem prescriptionItem : prescriptionItemsWithoutID){
-            System.out.println("name: " + prescriptionItem.getMedicationName());
             if((StringUtils.isNullOrWhiteSpace(prescriptionItem.getMedicationName()))) {
-                System.out.println("Hiiiii it worked");
                 continue;
             }
             createPrescriptionServiceResponse = medicationService.createPrescriptionWithNewMedication(

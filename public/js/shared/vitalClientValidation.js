@@ -48,12 +48,12 @@ var vitalClientValidator = function (vitalElements) {
         isValid = false;
     }
     //Height - Inches less than 12, CM less than 100
-    var maxHeight = (isMetric) ? 100 : 12;
+    /*var maxHeight = (isMetric) ? 100 : 12;
     if ($.trim(vitalElements.heightInches.val()) >= maxHeight) {
         vitalElements.heightInches.attr("placeholder", "Max value: " + (maxHeight - 1));
         vitalElements.heightInches.css('border-color', 'red');
         isValid = false;
-    }
+    }*/
     //Glucose
     if ($.trim(vitalElements.glucose.val().length) > 0 && integerCheck(vitalElements.glucose.val()) === false) {
         vitalElements.glucose.css('border-color', 'red');

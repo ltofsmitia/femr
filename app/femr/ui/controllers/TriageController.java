@@ -153,7 +153,12 @@ public class TriageController extends Controller {
 
         IndexViewModelPost viewModel = IndexViewModelForm.bindFromRequest().get();
         CurrentUser currentUser = sessionService.retrieveCurrentUserSession();
-
+        //gets the settings
+        ServiceResponse<SettingItem> settingsResponse = searchService.retrieveSystemSettings();
+        if (settingsResponse.hasErrors()){
+            throw new RuntimeException();
+        }
+        boolean isMetric1 = settingsResponse.getResponseObject().isMetric();
         //create a new patient
         //or get current patient for new encounter
         ServiceResponse<PatientItem> patientServiceResponse;
@@ -208,17 +213,51 @@ public class TriageController extends Controller {
             newVitals.put("oxygenSaturation", viewModel.getOxygenSaturation());
         }
 
+        if(isMetric1)
+        {
+            Float extraFeet = 0.0f;
+            if (viewModel.getHeightInches() != null) {
+                Float heightInches = viewModel.getHeightInches().floatValue();
+                if(heightInches > 99)
+                {
+                    extraFeet = (float)((int)(heightInches/100));
+                    heightInches%=100;
+                }
+                newVitals.put("heightInches", heightInches);
+            }
 
-        if (viewModel.getHeightFeet() != null) {
-            Float heightFeet = viewModel.getHeightFeet().floatValue();
-            newVitals.put("heightFeet", heightFeet);
+            if (viewModel.getHeightFeet() != null) {
+                Float heightFeet = viewModel.getHeightFeet().floatValue()+extraFeet;
+                newVitals.put("heightFeet", heightFeet);
+            }
+            else if(extraFeet != 0)
+            {
+                newVitals.put("heightFeet", extraFeet);
+            }
         }
+        else
+        {
+            Float extraFeet = 0.0f;
+            if (viewModel.getHeightInches() != null) {
+                Float heightInches = viewModel.getHeightInches().floatValue();
+                if(heightInches > 11)
+                {
+                    extraFeet = (float)((int)(heightInches/12));
+                    heightInches%=12;
+                }
+                newVitals.put("heightInches", heightInches);
+            }
 
-        if (viewModel.getHeightInches() != null) {
-           Float heightInches = viewModel.getHeightInches().floatValue();
-            newVitals.put("heightInches", heightInches);
+            if (viewModel.getHeightFeet() != null) {
+                Float heightFeet = viewModel.getHeightFeet().floatValue()+extraFeet;
+                newVitals.put("heightFeet", heightFeet);
+            }
+            else if(extraFeet != 0)
+            {
+                newVitals.put("heightFeet", extraFeet);
+            }
+
         }
-
         //Alaa Serhan
         if (viewModel.getWeight() != null) {
             Float weight = viewModel.getWeight();
