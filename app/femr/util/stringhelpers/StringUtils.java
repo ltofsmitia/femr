@@ -154,7 +154,7 @@ public class StringUtils {
      * @return returns "N/A" if feet and inches are null or a blank string for either if they are null
      */
     public static String outputHeightOrNA(Integer feet, Integer inches) {
-        if (feet == null && inches == null) {
+        if ((feet == null && inches == null) || (feet == 0 && inches == 0)) {
             return "N/A";
         } else {
             String output = "";
