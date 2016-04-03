@@ -170,6 +170,7 @@ var prescriptionFeature = {
     },
     addPrescriptionField: function () {
         var scriptIndex = prescriptionFeature.getNumberOfNonReadonlyPrescriptionFields();
+
         var $prescriptionRow = $("<div>").addClass("prescriptionRow prescriptionInput");
 
         var $medicationTypeAhead = $("<input type='text' name='prescriptions[" + scriptIndex + "].medicationName' class='medicationName form-control input-sm'/>");
@@ -207,7 +208,7 @@ var prescriptionFeature = {
             }
         } else {
             if (!$(lastPrescription).is('[readonly]')) {
-                $(lastPrescription).val('');
+                $(lastPrescription).val("");
             }
         }
 

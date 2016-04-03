@@ -26,6 +26,7 @@ import java.util.List;
 
 public class Repository<T> implements IRepository<T> {
 
+
     @Override
     public int count(Class<? extends T> clazz) {
         return Ebean.find(clazz).findRowCount();
@@ -75,6 +76,7 @@ public class Repository<T> implements IRepository<T> {
 
     @Override
     public T update(T entity) {
+
         Ebean.save(entity);
         return entity;
     }

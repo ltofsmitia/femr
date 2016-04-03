@@ -108,6 +108,15 @@
                                 <input type="text" class="hidden" name="patientSearchQuery" value="@viewModel.getPatientItem.getId"/>
                                 <button type="submit" id="historyButton" class="fButton fOtherButton pull-left">Patient History</button>
                             }
+
+                            <a class="fButton fOtherButton pull-left" href="/pharmacy/edit/@viewModel.getPatientItem.getId">
+                                See Patient in Pharmacy</a>
+
+                            <!--@helper.form(action = SearchController.handleSearch("history")) {
+                                <input type="text" class="hidden" name="patientSearchQuery" value="@viewModel.getPatientItem.getId"/>
+                                <button type="submit" id="historyButton" class="fButton fOtherButton pull-left">See Patient in Pharmacy</button>
+                            }-->
+
                         </div>
             </div>
 
