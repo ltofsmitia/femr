@@ -105,6 +105,22 @@ var prescriptionFeature = {
         $amountInput.val(amount);
     }
 };
+// Show/hide the replacement div
+function replaceClick() {
+    var $container = $(this).closest("li");
+    var $replacementDiv = $container.find(".replacement");
+    if ($replacementDiv.hasClass("hidden"))
+        $replacementDiv.removeClass("hidden")
+    else {
+        $replacementDiv.addClass("hidden");
+        // Reset input's to defaults
+        $replacementDiv.find(".prescriptionInput input").val("");
+        $replacementDiv.find(".prescriptionAmount input").val(0);
+    }
+}
+
+
+
 $(document).ready(function () {
     $('.replaceBtn').click(replaceClick);
 
@@ -119,20 +135,4 @@ $(document).ready(function () {
         prescriptionFeature.addAdministrationTypeahead();
     });
 });
-
-
-
-// Show/hide the replacement div
-function replaceClick() {
-    var $container = $(this).closest("li");
-    var $replacementDiv = $container.find(".replacement");
-    if ($replacementDiv.hasClass("hidden"))
-        $replacementDiv.removeClass("hidden")
-    else {
-        $replacementDiv.addClass("hidden");
-        // Reset input's to defaults
-        $replacementDiv.find(".prescriptionInput input").val("");
-        $replacementDiv.find(".prescriptionAmount input").val(0);
-    }
-}
 

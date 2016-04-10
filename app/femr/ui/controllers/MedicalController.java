@@ -2,9 +2,11 @@ package femr.ui.controllers;
 
 import com.google.inject.Inject;
 import femr.business.services.core.*;
+import femr.business.services.system.MedicationService;
 import femr.common.dtos.CurrentUser;
 import femr.common.dtos.ServiceResponse;
 import femr.common.models.*;
+import femr.data.models.mysql.PatientPrescription;
 import femr.data.models.mysql.Roles;
 import femr.ui.controllers.helpers.FieldHelper;
 import femr.ui.helpers.security.AllowedRoles;
@@ -31,15 +33,15 @@ public class MedicalController extends Controller {
 
     private final Form<EditViewModelPost> createViewModelPostForm = Form.form(EditViewModelPost.class);
     private final Form<UpdateVitalsModel> updateVitalsModelForm = Form.form(UpdateVitalsModel.class);
-    private final ITabService tabService;
-    private final IEncounterService encounterService;
-    private final IMedicationService medicationService;
-    private final IPhotoService photoService;
-    private final ISessionService sessionService;
-    private final ISearchService searchService;
-    private final IVitalService vitalService;
-    private final FieldHelper fieldHelper;
-    private final IInventoryService inventoryService;
+    private final ITabService tabService;//probably not
+    private final IEncounterService encounterService;//probably not
+    private final IMedicationService medicationService;//yes
+    private final IPhotoService photoService;//nope
+    private final ISessionService sessionService;//nope
+    private final ISearchService searchService;//maybe maybe
+    private final IVitalService vitalService;//nope
+    private final FieldHelper fieldHelper;//probably not
+    private final IInventoryService inventoryService;//probably not
 
     @Inject
     public MedicalController(ITabService tabService,
@@ -241,7 +243,14 @@ public class MedicalController extends Controller {
             throw new RuntimeException();
         }
         PatientEncounterItem patientEncounterItem = patientEncounterServiceResponse.getResponseObject();
+        //the Id stays constant throughout.
+        //System.out.println("EncounterId:"+patientEncounterItem.getId());
+
+
         patientEncounterItem = encounterService.checkPatientInToMedical(patientEncounterItem.getId(), currentUserSession.getId()).getResponseObject();
+
+
+
 
         //get and save problems
         List<String> problemList = new ArrayList<>();
@@ -302,16 +311,68 @@ public class MedicalController extends Controller {
         //create patient encounter photos
         photoService.createEncounterPhotos(request().body().asMultipartFormData().getFiles(), patientEncounterItem, viewModelPost);
 
+
+
+        //get all of the PatientPrescriptions
+        ServiceResponse<List<PatientPrescription>> allPastPatientPrescripitonsResponse = ((MedicationService) medicationService)
+                .retrieveAllPatientPrescriptionsByEncounterId(patientEncounterItem.getId());
+
+        List<PatientPrescription> allPastPatientPrescripitons = allPastPatientPrescripitonsResponse.getResponseObject();
+        //check for errors
+        if (patientEncounterServiceResponse.hasErrors()) {
+            throw new RuntimeException();
+        }
+
+        //compare the list of previous prescriptions with the new input
+
+        List<PrescriptionItem> listWithEdits = viewModelPost.getPrescriptions();
+
+        // loop though all of the pastprescriptions (from the last time sumbit was clicked in the Medical page)
+        //a couple of notes: .getId, .getMedicationName etc only work for objects that correspond to a row of
+        //data in the database. ie. you can't call .isDeleted on a PatientPrescription object because there's no
+        //isdeleted column in the database of patient_prescription(s)
+
+        for(int i=0;i<allPastPatientPrescripitons.size();i++){
+            //we edited treatmentTab.scala.html so that each prescription listed from the database has a corresponding
+            //input box below it. this is where users should type what they want to replace the above prescription with
+            //here, we loop through all the previously submitted prescriptions and compare them to their input boxes
+
+            //if an input box is not empty, the user is replacing the above prescription with the contents of the input box
+            //we then delete the corrresponding patientprescription from the database
+            //note: empty input boxes are not added by default, so we can ignore these entirely
+            //the boxes that are not empty will then be added, effectively replacing the old prescription
+            if(!StringUtils.isNullOrWhiteSpace(listWithEdits.get(i).getMedicationName())) {
+
+                //delete the entry at index i in allPastPatientPrescriptions in the database via the encounterId
+                ServiceResponse<PatientPrescription> ppResponse = ((MedicationService)medicationService)
+                        .removePatientPrescription(allPastPatientPrescripitons.get(i).getId());
+
+                if (ppResponse.hasErrors()) {
+                    throw new RuntimeException();
+                }
+            }
+
+        }
+
+
+        //List<PrescriptionItem> oldPrescriptionItemsWithID = medicationService.retrieveAllMedicationsByEncounterId()
+
+        //note, getPrescriptions() returns a List<PrescriptionItem>
+
         //get the prescriptions that have an ID (e.g. prescriptions that exist in the dictionary).
+
         List<PrescriptionItem> prescriptionItemsWithID = viewModelPost.getPrescriptions()
                 .stream()
                 .filter(prescription -> prescription.getMedicationID() != null)
                 .collect(Collectors.toList());
 
+
         //create the prescriptions that already have an ID
         ServiceResponse<PrescriptionItem> createPrescriptionServiceResponse;
         for (PrescriptionItem prescriptionItem : prescriptionItemsWithID){
 
+
+            //check if new stats are in database
             createPrescriptionServiceResponse = medicationService.createPrescription(
                     prescriptionItem.getMedicationID(),
                     prescriptionItem.getAdministrationId(),
@@ -319,6 +380,7 @@ public class MedicalController extends Controller {
                     currentUserSession.getId(),
                     prescriptionItem.getAmount(),
                     null);
+
 
             if (createPrescriptionServiceResponse.hasErrors()){
 
@@ -336,6 +398,7 @@ public class MedicalController extends Controller {
             if((StringUtils.isNullOrWhiteSpace(prescriptionItem.getMedicationName()))) {
                 continue;
             }
+
             createPrescriptionServiceResponse = medicationService.createPrescriptionWithNewMedication(
                     prescriptionItem.getMedicationName(),
                     prescriptionItem.getAdministrationId(),

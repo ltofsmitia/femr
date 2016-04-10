@@ -442,6 +442,7 @@ public class MedicationService implements IMedicationService {
         return response;
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -461,6 +462,34 @@ public class MedicationService implements IMedicationService {
                 medicationNames.add(m.getName());
             }
             response.setResponseObject(medicationNames);
+        } catch (Exception ex) {
+            response.addError("exception", ex.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * Retrieves a list of all PatientPrescriptions in the system assigned to a given encounterId.
+     * @param encounterId
+     * @return a ServiceResponse containing a List of all PatientPrescriptions meeting the above criteria,
+     * if they exist.
+     */
+    public ServiceResponse<List<PatientPrescription>> retrieveAllPatientPrescriptionsByEncounterId(int encounterId){
+        ServiceResponse<List<PatientPrescription>> response = new ServiceResponse<>();
+
+        try {
+
+            Query<PatientPrescription> prescriptionItemQuery = QueryProvider.getPatientPrescriptionQuery()
+                    .where()
+                    .eq("encounter_id",encounterId).orderBy("id");
+
+            List<? extends IPatientPrescription> patientPrescriptions;
+
+            patientPrescriptions = patientPrescriptionRepository.find(prescriptionItemQuery);
+
+            //response.setResponseObject((List<PatientPrescription>) patientPrescriptions);
+            response.setResponseObject((List<PatientPrescription>)patientPrescriptions);
         } catch (Exception ex) {
             response.addError("exception", ex.getMessage());
         }
@@ -677,4 +706,33 @@ public class MedicationService implements IMedicationService {
 
         return response;
     }
+
+    /**
+     * removes a PatientPrescription from the database based on it's id #.
+     * @param id
+     * @return
+     */
+    public ServiceResponse<PatientPrescription> removePatientPrescription(int id) {
+        ServiceResponse<PatientPrescription> response = new ServiceResponse<>();
+        try{
+
+            // Get the medication Item by it's ID
+            IPatientPrescription patientPrescription;
+            ExpressionList<PatientPrescription> patientPrescriptionQuery = QueryProvider.getPatientPrescriptionQuery()
+                    .where()
+                    .eq("id", id);
+
+            // Find one medication (should only be 1 with the ID) from the database
+            patientPrescription = patientPrescriptionRepository.findOne(patientPrescriptionQuery);
+
+            patientPrescriptionRepository.delete(patientPrescription);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            response.addError("exception", ex.getMessage());
+        }
+
+        return response;
+    }
+
 }

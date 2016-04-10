@@ -183,10 +183,13 @@ public class PharmaciesController extends Controller {
         // Map<id, isCounseled>
         Map<Integer, Boolean> prescriptionsToDispense = new HashMap<>();
 
+
+        int i=0;
         for(PrescriptionItem script : createViewModelPost.getPrescriptions()) {
             //If getMedicationID is not null then a replacement is being done
             if (script.getMedicationID() != null) {
                 //create the prescription
+
                 ServiceResponse<PrescriptionItem> createPrescriptionResponse = medicationService.createPrescription(script.getMedicationID(),
                         script.getAdministrationId(),
                         patientEncounterItem.getId(),
@@ -197,6 +200,9 @@ public class PharmaciesController extends Controller {
 
                 //replace the prescription
                 prescriptionsToReplace.put(newPrescriptionItem.getId(), script.getId());
+                System.out.println("MIDs"+newPrescriptionItem.getMedicationID()+" / "+ script.getMedicationID());
+                System.out.println("Ids"+newPrescriptionItem.getId()+" / "+ script.getId());
+
 
             } else {
 

@@ -43,23 +43,40 @@
             </div>
         </div>
         <div class="row">
+
             <div class="col-xs-9 col-sm-9 col-md-9 prescriptionWrap">
-                @for(script <- prescriptions) {
-                    <div class="prescriptionRow">
-                        <input class='medicationID' value='@script.getMedicationID' type='hidden' />
-                        <input class='administrationID' value='@script.getAdministrationId' type='hidden' />
-                        <span class="prescriptionName">
-                            <input type="text" class="medicationName form-control input-sm" value="@script.getName (@outputStringOrNA(script.getMedicationForm).toString().trim())" readonly/>
+                @for(x <- 0 to prescriptions.size()-1) {
+
+                        <div class="prescriptionRow">
+
+                            <input class='medicationID' value='@prescriptions.get(x).getMedicationID' type='hidden' />
+                            <input class='administrationID' value='@prescriptions.get(x).getAdministrationId' type='hidden' />
+                            <span class="prescriptionName">
+                                <input type="text" class="medicationName form-control input-sm" value="@prescriptions.get(x).getName (@outputStringOrNA(prescriptions.get(x).getMedicationForm).toString().trim())" readonly/>
+                            </span
+                            ><span class="prescriptionAdministrationName">
+                                <input type="text" class="form-control input-sm" value="@prescriptions.get(x).getAdministrationName" readonly/>
+                            </span
+                            ><span class="prescriptionAmount">
+                                <input type="text" class="form-control input-sm" value="@prescriptions.get(x).getAmount" readonly />
+                            </span>
+                        </div>
+
+                        <div class="prescriptionRow prescriptionInput">
+                            <input class='medicationID' name='prescriptions[@(x)].medicationID' type='hidden' />
+                            <input class='administrationID' name="prescriptions[@(x)].administrationID" type='hidden' />
+                            <span class="prescriptionName">
+                                <input type='text' name="prescriptions[@(x)].medicationName" placeholder = "Edit: @prescriptions.get(x).getName (@outputStringOrNA(prescriptions.get(x).getMedicationForm).toString().trim())"class='medicationName form-control input-sm'/>
+                            </span
+                            ><span class="prescriptionAdministrationName"><input type="text" placeholder="Edit: @prescriptions.get(x).getAdministrationName" class="administrationName form-control input-sm"/></span
+                        ><span class="prescriptionAdministrationDays"><input type="number" placeholder="X"  class="form-control input-sm" />
                         </span
-                        ><span class="prescriptionAdministrationName">
-                            <input type="text" class="form-control input-sm" value="@script.getAdministrationName" readonly/>
-                        </span
-                        ><span class="prescriptionAmount">
-                            <input type="text" class="form-control input-sm" value="@script.getAmount" readonly />
-                        </span>
-                    </div>
+                        ><span class="prescriptionAmount"><input name="prescriptions[@(x)].amount" type="number" placeholder="Edit: @prescriptions.get(x).getAmount" class="form-control input-sm"/></span>
+                        </div>
                 }
-                <div class="prescriptionRow prescriptionInput">
+
+
+                <!--<div class="prescriptionRow prescriptionInput">
                     <input class='medicationID' name='prescriptions[0].medicationID' type='hidden' />
                     <input class='administrationID' name="prescriptions[0].administrationID" type='hidden' />
                     <span class="prescriptionName"><input type='text' name="prescriptions[0].medicationName" class='medicationName form-control input-sm'/></span
@@ -67,8 +84,10 @@
                     ><span class="prescriptionAdministrationDays"><input type="number" placeholder="X"  class="form-control input-sm" />
                     </span
                     ><span class="prescriptionAmount"><input name="prescriptions[0].amount" type="number" class="form-control input-sm"/></span>
-                </div>
+                </div>-->
+
             </div>
+
             <div class="col-xs-3 col-sm-3 col-md-3">
                 <div class="row">
                     <button id="addPrescriptionButton" class="btn addSubtractBtn" type="button"><span class="glyphicon glyphicon-plus"></span></button>
