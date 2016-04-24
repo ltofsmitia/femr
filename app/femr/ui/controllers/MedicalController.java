@@ -16,6 +16,7 @@ import femr.ui.views.html.medical.index;
 import femr.ui.views.html.medical.edit;
 import femr.ui.views.html.medical.newVitals;
 import femr.ui.views.html.medical.listVitals;
+import femr.ui.views.html.partials.medical.tabs.prescriptionRow;
 import femr.util.DataStructure.Mapping.TabFieldMultiMap;
 import femr.util.DataStructure.Mapping.VitalMultiMap;
 import femr.util.stringhelpers.StringUtils;
@@ -183,22 +184,34 @@ public class MedicalController extends Controller {
 
             throw new RuntimeException();
         }
+
+        ServiceResponse<Map<String, List<String>>> tabFieldToTabMappingServiceResponse = tabService.retrieveTabFieldToTabMapping(false, false);
+        if (tabFieldToTabMappingServiceResponse.hasErrors()){
+
+            throw new RuntimeException();
+        }
+        Map<String, List<String>> tabFieldToTabMapping = tabFieldToTabMappingServiceResponse.getResponseObject();
+
+
+
         List<TabItem> tabItems = tabItemServiceResponse.getResponseObject();
         //match the fields to their respective tabs
         for (TabItem tabItem : tabItems) {
 
             switch (tabItem.getName().toLowerCase()) {
                 case "hpi":
-                    tabItem.setFields(FieldHelper.structureHPIFieldsForView(tabFieldMultiMap));
+                    tabItem.setFields(FieldHelper.structureHPIFieldsForView(tabFieldMultiMap, tabFieldToTabMapping.get("hpi")));
                     break;
                 case "pmh":
-                    tabItem.setFields(FieldHelper.structurePMHFieldsForView(tabFieldMultiMap));
+                    tabItem.setFields(FieldHelper.structurePMHFieldsForView(tabFieldMultiMap, tabFieldToTabMapping.get("pmh")));
                     break;
                 case "treatment":
-                    tabItem.setFields(FieldHelper.structureTreatmentFieldsForView(tabFieldMultiMap));
+                    tabItem.setFields(FieldHelper.structureTreatmentFieldsForView(tabFieldMultiMap, tabFieldToTabMapping.get("treatment")));
+                    break;
+                case "photos":
                     break;
                 default:
-                    tabItem.setFields(fieldHelper.structureDynamicFieldsForView(tabFieldMultiMap));
+                    tabItem.setFields(fieldHelper.structureDynamicFieldsForView(tabFieldMultiMap, tabFieldToTabMapping.get(tabItem.getName().toLowerCase())));
                     break;
             }
         }
@@ -222,6 +235,26 @@ public class MedicalController extends Controller {
         VitalMultiMap vitalMultiMap = vitalMapResponse.getResponseObject();
 
         return ok(edit.render(currentUserSession, vitalMultiMap, viewModelGet));
+    }
+
+    /**
+     * Get the populated partial view that represents 1 row of new prescription fields
+     * - meant to be an AJAX call
+     *
+     * @param index
+     * @return
+     */
+    public Result prescriptionRowGet( int index )
+    {
+        //get MedicationAdministrationItems
+        ServiceResponse<List<MedicationAdministrationItem>> medicationAdministrationItemServiceResponse =
+                medicationService.retrieveAvailableMedicationAdministrations();
+        if (medicationAdministrationItemServiceResponse.hasErrors()) {
+            throw new RuntimeException();
+        }
+        List<MedicationAdministrationItem> items = medicationAdministrationItemServiceResponse.getResponseObject();
+
+        return ok( prescriptionRow.render( items, index, null ) );
     }
 
     public Result editPost(int patientId) {
@@ -325,14 +358,14 @@ public class MedicalController extends Controller {
 
         //compare the list of previous prescriptions with the new input
 
-        List<PrescriptionItem> listWithEdits = viewModelPost.getPrescriptions();
+        //List<PrescriptionItem> listWithEdits = viewModelPost.getPrescriptions();
 
         // loop though all of the pastprescriptions (from the last time sumbit was clicked in the Medical page)
         //a couple of notes: .getId, .getMedicationName etc only work for objects that correspond to a row of
         //data in the database. ie. you can't call .isDeleted on a PatientPrescription object because there's no
         //isdeleted column in the database of patient_prescription(s)
 
-        for(int i=0;i<allPastPatientPrescripitons.size();i++){
+        /*for(int i=0;i<allPastPatientPrescripitons.size();i++){
             //we edited treatmentTab.scala.html so that each prescription listed from the database has a corresponding
             //input box below it. this is where users should type what they want to replace the above prescription with
             //here, we loop through all the previously submitted prescriptions and compare them to their input boxes
@@ -352,7 +385,7 @@ public class MedicalController extends Controller {
                 }
             }
 
-        }
+        }*/
 
 
         //List<PrescriptionItem> oldPrescriptionItemsWithID = medicationService.retrieveAllMedicationsByEncounterId()
@@ -375,7 +408,7 @@ public class MedicalController extends Controller {
             //check if new stats are in database
             createPrescriptionServiceResponse = medicationService.createPrescription(
                     prescriptionItem.getMedicationID(),
-                    prescriptionItem.getAdministrationId(),
+                    prescriptionItem.getAdministrationID(),
                     patientEncounterItem.getId(),
                     currentUserSession.getId(),
                     prescriptionItem.getAmount(),
@@ -388,10 +421,12 @@ public class MedicalController extends Controller {
             }
         }
 
-        //get the prescriptions that DO NOT have an ID (e.g. prescriptions that DO NOT exist in the dictionary).
+        // get the prescriptions that DO NOT have an ID (e.g. prescriptions that DO NOT exist in the dictionary).
+        // also ignore new new prescriptions that do not have a name
         List<PrescriptionItem> prescriptionItemsWithoutID = viewModelPost.getPrescriptions()
                 .stream()
-                .filter(prescription -> prescription.getMedicationID() == null)
+                .filter( prescription -> prescription.getMedicationID() == null )
+                .filter( prescription -> StringUtils.isNotNullOrWhiteSpace( prescription.getMedicationName() ) )
                 .collect(Collectors.toList());
 
         for (PrescriptionItem prescriptionItem : prescriptionItemsWithoutID){
@@ -399,9 +434,14 @@ public class MedicalController extends Controller {
                 continue;
             }
 
+            //The POST data sends -1 if an administration ID is not set. Null is more appropriate for the
+            //service layer
+            if (prescriptionItem.getAdministrationID() == -1)
+                prescriptionItem.setAdministrationID(null);
+
             createPrescriptionServiceResponse = medicationService.createPrescriptionWithNewMedication(
                     prescriptionItem.getMedicationName(),
-                    prescriptionItem.getAdministrationId(),
+                    prescriptionItem.getAdministrationID(),
                     patientEncounterItem.getId(),
                     currentUserSession.getId(),
                     prescriptionItem.getAmount(),

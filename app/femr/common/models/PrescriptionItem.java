@@ -27,7 +27,7 @@ public class PrescriptionItem {
     private String originalMedicationName;
     private String prescriberFirstName;
     private String prescriberLastName;
-    private Integer administrationId;
+    private Integer administrationID;
     private String administrationName;
     private Float administrationModifier;
     private Integer amount;
@@ -38,6 +38,8 @@ public class PrescriptionItem {
     //of the particular medication, how much remains in the inventory?
     private Integer medicationRemaining;
     private List<MedicationItem.ActiveIngredient> medicationActiveDrugs;
+    //was the checkbox checked for this prescription indicating the patient was counseled by the pharmacist
+    private Boolean isCounseled;
 
     public PrescriptionItem(String name){
         medicationActiveDrugs = new ArrayList<MedicationItem.ActiveIngredient>();
@@ -80,12 +82,12 @@ public class PrescriptionItem {
         this.prescriberLastName = prescriberLastName;
     }
 
-    public Integer getAdministrationId() {
-        return administrationId;
+    public Integer getAdministrationID() {
+        return administrationID;
     }
 
-    public void setAdministrationId(Integer administrationId) {
-        this.administrationId = administrationId;
+    public void setAdministrationID(Integer administrationID) {
+        this.administrationID = administrationID;
     }
 
     public String getAdministrationName() {
@@ -160,5 +162,13 @@ public class PrescriptionItem {
 
     public void setMedicationName(String medicationName) {
         this.medicationName = medicationName;
+    }
+
+    public Boolean getCounseled() {
+        return isCounseled;
+    }
+
+    public void setCounseled(Boolean counseled) {
+        isCounseled = counseled;
     }
 }

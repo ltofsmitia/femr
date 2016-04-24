@@ -1,3 +1,4 @@
+
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
@@ -6,14 +7,6 @@ GET         /superuser/tabs/:name                              @femr.ui.controll
 POST        /superuser/tabs/:name                              @femr.ui.controllers.superuser.TabController.fieldsPost(name: String)
 GET         /superuser/tabs                                    @femr.ui.controllers.superuser.TabController.manageGet()
 POST        /superuser/tabs                                    @femr.ui.controllers.superuser.TabController.managePost()
-GET         /superuser/trips                                   @femr.ui.controllers.superuser.TripController.manageGet()
-POST        /superuser/trips                                   @femr.ui.controllers.superuser.TripController.managePost()
-GET         /superuser/trips/edit/:id                          @femr.ui.controllers.superuser.TripController.editGet(id: Integer)
-POST        /superuser/trips/edit/:id                          @femr.ui.controllers.superuser.TripController.editPost(id: Integer)
-GET         /superuser/trips/teams                             @femr.ui.controllers.superuser.TripController.teamsGet()
-POST        /superuser/trips/teams                             @femr.ui.controllers.superuser.TripController.teamsPost()
-GET         /superuser/trips/cities                            @femr.ui.controllers.superuser.TripController.citiesGet()
-POST        /superuser/trips/cities                            @femr.ui.controllers.superuser.TripController.citiesPost()
 GET         /superuser                                         @femr.ui.controllers.superuser.SuperuserController.indexGet()
 #Admin
 POST        /admin/users/create                                @femr.ui.controllers.admin.UsersController.createPost()
@@ -24,10 +17,18 @@ POST        /admin/users/toggle/:id                            @femr.ui.controll
 GET         /admin/users                                       @femr.ui.controllers.admin.UsersController.manageGet()
 GET         /admin/inventory                                   @femr.ui.controllers.admin.InventoryController.manageGet()
 POST        /admin/inventory                                   @femr.ui.controllers.admin.InventoryController.managePost()
-POST        /admin/inventory/get                               @femr.ui.controllers.admin.InventoryController.ajaxGet()
-POST        /admin/inventory/delete/:id                        @femr.ui.controllers.admin.InventoryController.ajaxDelete(id: Integer)
+POST        /admin/inventory/delete/:id/:tripId                @femr.ui.controllers.admin.InventoryController.ajaxDelete(id: Integer, tripId: Integer)
+POST        /admin/inventory/edit/:id/:tripId                  @femr.ui.controllers.admin.InventoryController.ajaxEdit(id: Integer, tripId: Integer)
 GET         /admin/configure                                   @femr.ui.controllers.admin.ConfigureController.manageGet()
 POST        /admin/configure                                   @femr.ui.controllers.admin.ConfigureController.managePost()
+GET         /admin/trips                                       @femr.ui.controllers.admin.TripController.manageGet()
+POST        /admin/trips                                       @femr.ui.controllers.admin.TripController.managePost()
+GET         /admin/trips/edit/:id                              @femr.ui.controllers.admin.TripController.editGet(id: Integer)
+POST        /admin/trips/edit/:id                              @femr.ui.controllers.admin.TripController.editPost(id: Integer)
+GET         /admin/trips/teams                                 @femr.ui.controllers.admin.TripController.teamsGet()
+POST        /admin/trips/teams                                 @femr.ui.controllers.admin.TripController.teamsPost()
+GET         /admin/trips/cities                                @femr.ui.controllers.admin.TripController.citiesGet()
+POST        /admin/trips/cities                                @femr.ui.controllers.admin.TripController.citiesPost()
 GET         /admin                                             @femr.ui.controllers.admin.AdminController.index()
 #Pharmacy
 GET         /pharmacy/edit/:id                                 @femr.ui.controllers.PharmaciesController.editGet(id: Integer)
@@ -57,6 +58,7 @@ GET         /triage/:id                                        @femr.ui.controll
 GET         /triage                                            @femr.ui.controllers.TriageController.indexGet()
 POST        /triage                                            @femr.ui.controllers.TriageController.indexPost(id: Integer)
 POST        /triage/:id                                        @femr.ui.controllers.TriageController.deletePatientPost(id: Integer)
+
 #Medical
 POST        /medical/updateVitals/:id                          @femr.ui.controllers.MedicalController.updateVitalsPost(id: Integer)
 GET         /medical/newVitals                                 @femr.ui.controllers.MedicalController.newVitalsGet()
@@ -65,6 +67,7 @@ GET         /medical/edit/:id                                  @femr.ui.controll
 POST        /medical/edit/:id                                  @femr.ui.controllers.MedicalController.editPost(id: Integer)
 GET         /medical                                           @femr.ui.controllers.MedicalController.indexGet()
 POST        /medical                                           @femr.ui.controllers.MedicalController.indexPost()
+GET         /medical/prescriptionRow/:index                    @femr.ui.controllers.MedicalController.prescriptionRowGet( index: Integer )
 #Research
 GET         /research                                          @femr.ui.controllers.ResearchController.indexGet()
 POST        /research                                          @femr.ui.controllers.ResearchController.indexPost()

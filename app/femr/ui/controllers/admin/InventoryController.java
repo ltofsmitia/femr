@@ -26,14 +26,14 @@ import femr.common.dtos.CurrentUser;
 import femr.common.dtos.ServiceResponse;
 import femr.business.services.core.IInventoryService;
 import femr.business.services.core.ISessionService;
-import femr.data.models.core.IMissionTrip;
-import femr.data.models.mysql.MissionTrip;
+import femr.common.models.MissionTripItem;
 import femr.data.models.mysql.Roles;
 import femr.ui.helpers.security.AllowedRoles;
 import femr.ui.helpers.security.FEMRAuthenticated;
 import femr.ui.models.admin.inventory.*;
 import femr.common.models.MedicationItem;
 import femr.ui.views.html.admin.inventory.manage;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -41,13 +41,7 @@ import play.mvc.Security;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-/**
- * Right now, the inventory feature supports the adding of medications, but
- * when a physician submits a prescription it simply creates a new medication
- * with a name equal to the prescription. The feature is not complete, yet.
- */
 @Security.Authenticated(FEMRAuthenticated.class)
 @AllowedRoles({Roles.ADMINISTRATOR, Roles.SUPERUSER})
 public class InventoryController extends Controller {
@@ -74,12 +68,33 @@ public class InventoryController extends Controller {
     public Result manageGet() {
         CurrentUser currentUser = sessionService.retrieveCurrentUserSession();
 
+
         InventoryViewModelGet viewModel = new InventoryViewModelGet();
-        ServiceResponse<List<MedicationItem>> medicationServiceResponse = medicationService.retrieveMedicationInventory();
-        if (medicationServiceResponse.hasErrors()) {
-            throw new RuntimeException();
-        } else {
-            viewModel.setMedications(medicationServiceResponse.getResponseObject());
+
+        // If the use does not have a trip ID, we cannot retrieve the list of medications
+        // since they are tied to a trip
+        if( currentUser.getTripId() != null ){
+
+            ServiceResponse<List<MedicationItem>> medicationServiceResponse = medicationService.retrieveMedicationInventory(currentUser.getTripId());
+            if (medicationServiceResponse.hasErrors()) {
+                throw new RuntimeException();
+            } else {
+                viewModel.setMedications(medicationServiceResponse.getResponseObject());
+            }
+
+            ServiceResponse<MissionTripItem> missionTripServiceResponse = missionTripService.retrieveAllTripInformationByTripId(currentUser.getTripId());
+            if (missionTripServiceResponse.hasErrors()) {
+
+                throw new RuntimeException();
+            } else {
+
+                viewModel.setMissionTripItem(missionTripServiceResponse.getResponseObject());
+            }
+
+        }
+        else{
+
+            viewModel.setMedications( new ArrayList<>() );
         }
 
         ServiceResponse<List<String>> availableMedicationUnitsResponse = medicationService.retrieveAvailableMedicationUnits();
@@ -126,18 +141,16 @@ public class InventoryController extends Controller {
         // assumes medication strength is a good indicator of how many
         // strength/unit/ingredients (active ingredietns) are involved
         // *denominator field not taken into consideration - always false
-        for (int activeIngredientIndex = 0;
-             activeIngredientIndex < inventoryViewModelPost.getMedicationStrength().size();
-             activeIngredientIndex++) {
+        for (int genericIndex = 0; genericIndex < inventoryViewModelPost.getMedicationStrength().size(); genericIndex++) {
 
-            if (inventoryViewModelPost.getMedicationIngredient().get(activeIngredientIndex) != null &&
-                    inventoryViewModelPost.getMedicationUnit().get(activeIngredientIndex) != null &&
-                    inventoryViewModelPost.getMedicationStrength().get(activeIngredientIndex) != null) {
+            if (inventoryViewModelPost.getMedicationIngredient().get(genericIndex) != null &&
+                    inventoryViewModelPost.getMedicationUnit().get(genericIndex) != null &&
+                    inventoryViewModelPost.getMedicationStrength().get(genericIndex) != null) {
 
                 medicationItem.addActiveIngredient(
-                        inventoryViewModelPost.getMedicationIngredient().get(activeIngredientIndex),
-                        inventoryViewModelPost.getMedicationUnit().get(activeIngredientIndex),
-                        inventoryViewModelPost.getMedicationStrength().get(activeIngredientIndex),
+                        inventoryViewModelPost.getMedicationIngredient().get(genericIndex),
+                        inventoryViewModelPost.getMedicationUnit().get(genericIndex),
+                        inventoryViewModelPost.getMedicationStrength().get(genericIndex),
                         false
                 );
             }
@@ -168,39 +181,31 @@ public class InventoryController extends Controller {
         return redirect("/admin/inventory");
     }
 
-    /* Andre Farah - Updated  */
-    public Result ajaxGet() {
 
-        //Andre Farah - Changed from bindFromRequest() to bind(reqqest().body().asJson()) to properly bind
-        //              the json objects passed from bs_grid
-        Form<InventoryViewModelDataQuery> form = inventoryViewModelDataQueryForm.bind(request().body().asJson());
-        if (form.hasErrors()) {
-            throw new RuntimeException();
-        }
-        InventoryViewModelDataQuery dataQuery = form.get();
+    public Result ajaxDelete(int medicationID, int tripId) {
+        ServiceResponse<MedicationItem> inventoryServiceResponse = inventoryService.deleteInventoryMedication(medicationID, tripId);
 
-        // Get paginated rows
-        ServiceResponse<ObjectNode> medicationServiceResponse = inventoryService.getPaginatedMedicationInventory(
-                dataQuery.getPage_num(),
-                dataQuery.getRows_per_page(),
-                dataQuery.getSorting(), //Andre Farah - Added for Sorting
-                dataQuery.getFilter_rules()// Andre Farah - Added for Filtering
-        );
-        if (medicationServiceResponse.hasErrors()) {
-            throw new RuntimeException();
-        }
-
-        ObjectNode result = medicationServiceResponse.getResponseObject();
-
-        return ok(result);
-
-    }
-
-    public Result ajaxDelete(int medicationID) {
-        ServiceResponse<MedicationItem> inventoryServiceResponse = medicationService.deleteMedication(medicationID);
         if (inventoryServiceResponse.hasErrors()) {
             throw new RuntimeException();
         }
         return ok("true");
     }
+
+
+    /**
+     * Alters medication based on submit.
+     */
+    public Result ajaxEdit(int medicationID, int tripId) {
+        // Get POST data
+        DynamicForm df = play.data.Form.form().bindFromRequest();
+        int quantity = Integer.parseInt(df.get("quantity"));
+
+        ServiceResponse<MedicationItem> inventoryServiceResponse = inventoryService.setQuantityCurrent(medicationID, tripId, quantity);
+        if (inventoryServiceResponse.hasErrors()) {
+            throw new RuntimeException();
+        }
+        return ok("true");
+    }
+
+
 }
