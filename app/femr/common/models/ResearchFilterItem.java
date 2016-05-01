@@ -18,6 +18,8 @@
 */
 package femr.common.models;
 
+import femr.ui.models.research.FilterViewModel;
+
 import java.util.List;
 
 public class ResearchFilterItem {
@@ -34,6 +36,29 @@ public class ResearchFilterItem {
     private String medicationName;
     private String orderBy;
     private Integer MissionTripId; // Andrew Trip Filter
+
+    public ResearchFilterItem(FilterViewModel filterViewModel) {
+        primaryDataset = filterViewModel.getPrimaryDataset();
+        secondaryDataset = filterViewModel.getSecondaryDataset();
+        graphType = filterViewModel.getGraphType();
+        startDate=filterViewModel.getStartDate();
+        endDate = filterViewModel.getEndDate();
+
+        Integer groupFactor = filterViewModel.getGroupFactor();
+        this.groupFactor = groupFactor;
+        if (groupFactor != null && groupFactor > 0) {
+
+            groupPrimary = filterViewModel.isGroupPrimary();
+        } else {
+
+            groupPrimary = false;
+        }
+
+        filterRangeStart = filterViewModel.getFilterRangeStart();
+        filterRangeEnd = filterViewModel.getFilterRangeEnd();
+        medicationName = filterViewModel.getMedicationName();
+        MissionTripId = filterViewModel.getMissionTripId(); //Andrew Trip Filter
+    }
 
     public String getPrimaryDataset() {
         return primaryDataset;

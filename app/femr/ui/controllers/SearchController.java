@@ -53,6 +53,7 @@ public class SearchController extends Controller {
 
         String patientSearchQuery = request().getQueryString("patientSearchQuery");
 
+
         ServiceResponse<List<PatientItem>> patientResponse = searchService.retrievePatientsFromQueryString(patientSearchQuery);
         if (patientResponse.hasErrors()) {
             throw new RuntimeException();

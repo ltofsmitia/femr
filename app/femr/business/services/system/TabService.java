@@ -196,10 +196,10 @@ public class TabService implements ITabService {
             for (ITabField tf : tabFields) {
 
                 if (tf.getTabFieldSize() != null)
-                    size = tf.getTabFieldSize().getName();
+                    size = ((TabField)tf).getTabFieldSizeName();
 
                 customFieldItems.add(itemModelMapper.createTabFieldItem(tf.getName(),
-                        tf.getTabFieldType().getName(),
+                        ((TabField)tf).getTabFieldTypeName(),
                         size,
                         tf.getOrder(),
                         tf.getPlaceholder(),
@@ -241,10 +241,10 @@ public class TabService implements ITabService {
             tabField = tabFieldRepository.update(tabField);
             String size = null;
             if (tabField.getTabFieldSize() != null)
-                size = tabField.getTabFieldSize().getName();
+                size = ((TabField)tabField).getTabFieldSizeName();
 
             TabFieldItem tabFieldItem = itemModelMapper.createTabFieldItem(tabField.getName(),
-                    tabField.getTabFieldType().getName(),
+                    ((TabField)tabField).getTabFieldTypeName(),
                     size,
                     tabField.getOrder(),
                     tabField.getPlaceholder(),
@@ -330,10 +330,10 @@ public class TabService implements ITabService {
             String size = null;
 
             if (tabField.getTabFieldSize() != null)
-                size = tabField.getTabFieldSize().getName();
+                size = ((TabField)tabField).getTabFieldSizeName();
 
             TabFieldItem newTabFieldItem = itemModelMapper.createTabFieldItem(tabField.getName(),
-                    tabField.getTabFieldType().getName(),
+                    ((TabField)tabField).getTabFieldTypeName(),
                     size,
                     tabField.getOrder(),
                     tabField.getPlaceholder(),
@@ -414,10 +414,10 @@ public class TabService implements ITabService {
             String size = null;
 
             if (customField.getTabFieldSize() != null)
-                size = customField.getTabFieldSize().getName();
+                size = ((TabField)customField).getTabFieldSizeName();
 
             TabFieldItem newTabFieldItem = itemModelMapper.createTabFieldItem(customField.getName(),
-                    customField.getTabFieldType().getName(),
+                    ((TabField)customField).getTabFieldTypeName(),
                     size,
                     customField.getOrder(),
                     customField.getPlaceholder(),
@@ -553,12 +553,12 @@ public class TabService implements ITabService {
         List<? extends IPatientEncounterTabField> patientEncounterTabFields = patientEncounterTabFieldRepository.find(patientEncounterTabFieldQuery);
 
         for (IPatientEncounterTabField tf : patientEncounterTabFields) {
-            if (tf.getChiefComplaint() != null && tf.getChiefComplaint().getValue().equals(chiefComplaintName)) {
+            if (tf.getChiefComplaint() != null && ((PatientEncounterTabField)tf).getChiefComplaintValue().equals(chiefComplaintName)) {
                 //Only add tabFields for the request chief complaint
-                tabFieldMultiMap.put(tabFieldName, tf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(tf.getTabField().getName(), tf.getTabField().getTabFieldType().getName(), "", 0, "", tf.getTabFieldValue(), null, false, tf.getUserName()));
+                tabFieldMultiMap.put(tabFieldName, tf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(((PatientEncounterTabField)tf).getTabFieldName(), ((PatientEncounterTabField)tf).getTabFieldTypeName(), "", 0, "", tf.getTabFieldValue(), null, false, tf.getUserName()));
             } else if (chiefComplaintName == null || chiefComplaintName.isEmpty()) {
                 //No chief complaint, so put all matching fields
-                tabFieldMultiMap.put(tabFieldName, tf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(tf.getTabField().getName(), tf.getTabField().getTabFieldType().getName(), "", 0, "", tf.getTabFieldValue(), null, false, tf.getUserName()));
+                tabFieldMultiMap.put(tabFieldName, tf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(((PatientEncounterTabField)tf).getTabFieldName(), ((PatientEncounterTabField)tf).getTabFieldTypeName(), "", 0, "", tf.getTabFieldValue(), null, false, tf.getUserName()));
             }
         }
 
@@ -639,26 +639,26 @@ public class TabService implements ITabService {
             for (IPatientEncounterTabField petf : patientEncounterTabFields) {
                 String tabFieldSize = null;
                 String chiefComplaint = null;
-                boolean isCustom = petf.getTabField().getTab().getIsCustom();
-                if (petf.getTabField().getTabFieldSize() != null)
-                    tabFieldSize = petf.getTabField().getTabFieldSize().getName();
+                boolean isCustom = ((PatientEncounterTabField)petf).getTabFieldTabIsCustom();
+                if (((PatientEncounterTabField) petf).getTabFieldSize() != null)
+                    tabFieldSize = ((PatientEncounterTabField)petf).getTabFieldSizeName();
                 if (petf.getChiefComplaint() != null)
-                    chiefComplaint = petf.getChiefComplaint().getValue();
+                    chiefComplaint = ((PatientEncounterTabField)petf).getChiefComplaintValue();
 
-                tabFieldName = petf.getTabField().getName();
+                tabFieldName = ((PatientEncounterTabField)petf).getTabFieldName();
 
-                if (petf.getTabField().getTab().getName().equals("HPI")) {
+                if (((PatientEncounterTabField) petf).getTabFieldTabName().equals("HPI")) {
 
                     if (chiefComplaints != null && chiefComplaints.size() > 0) {
 
-                        tabFieldMultiMap.put(tabFieldName, petf.getDateTaken().toString().trim(), chiefComplaint, itemModelMapper.createTabFieldItem(petf.getTabField().getName(), petf.getTabField().getTabFieldType().getName(), tabFieldSize, petf.getTabField().getOrder(), petf.getTabField().getPlaceholder(), petf.getTabFieldValue(), chiefComplaint, isCustom, petf.getUserName()));
+                        tabFieldMultiMap.put(tabFieldName, petf.getDateTaken().toString().trim(), chiefComplaint, itemModelMapper.createTabFieldItem(((PatientEncounterTabField) petf).getTabFieldName(), ((PatientEncounterTabField)petf).getTabFieldTypeName(), tabFieldSize, ((PatientEncounterTabField)petf).getTabFieldOrder(), ((PatientEncounterTabField)petf).getTabFieldPlaceholder(), petf.getTabFieldValue(), chiefComplaint, isCustom, petf.getUserName()));
                     } else {
 
-                        tabFieldMultiMap.put(tabFieldName, petf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(petf.getTabField().getName(), petf.getTabField().getTabFieldType().getName(), tabFieldSize, petf.getTabField().getOrder(), petf.getTabField().getPlaceholder(), petf.getTabFieldValue(), null, isCustom, petf.getUserName()));
+                        tabFieldMultiMap.put(tabFieldName, petf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(((PatientEncounterTabField) petf).getTabFieldName(), ((PatientEncounterTabField)petf).getTabFieldTypeName(), tabFieldSize, ((PatientEncounterTabField)petf).getTabFieldOrder(), ((PatientEncounterTabField)petf).getTabFieldPlaceholder(), petf.getTabFieldValue(), null, isCustom, petf.getUserName()));
                     }
                 } else {
 
-                    tabFieldMultiMap.put(tabFieldName, petf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(petf.getTabField().getName(), petf.getTabField().getTabFieldType().getName(), tabFieldSize, petf.getTabField().getOrder(), petf.getTabField().getPlaceholder(), petf.getTabFieldValue(), chiefComplaint, isCustom, petf.getUserName()));
+                    tabFieldMultiMap.put(tabFieldName, petf.getDateTaken().toString().trim(), null, itemModelMapper.createTabFieldItem(((PatientEncounterTabField) petf).getTabFieldName(), ((PatientEncounterTabField)petf).getTabFieldTypeName(), tabFieldSize, ((PatientEncounterTabField)petf).getTabFieldOrder(), ((PatientEncounterTabField)petf).getTabFieldPlaceholder(), petf.getTabFieldValue(), chiefComplaint, isCustom, petf.getUserName()));
                 }
 
 
@@ -668,26 +668,26 @@ public class TabService implements ITabService {
 
             for (ITabField tf : tabFields) {
                 String tabFieldSize = null;
-                boolean isCustom = tf.getTab().getIsCustom();
+                boolean isCustom = ((TabField)tf).getTabIsCustom();
                 if (tf.getTabFieldSize() != null)
-                    tabFieldSize = tf.getTabFieldSize().getName();
+                    tabFieldSize = ((TabField) tf).getTabFieldSizeName();
 
                 //hpi gets special treatment for each chief complaint
-                if (tf.getTab().getName().equals("HPI")) {
+                if (((TabField) tf).getTabName().equals("HPI")) {
 
                     if (chiefComplaints != null && chiefComplaints.size() > 0) {
                         for (IChiefComplaint cc : chiefComplaints) {
                             if (!tabFieldMultiMap.containsTabField(tf.getName(), cc.getValue())) {
-                                tabFieldMultiMap.put(tf.getName(), null, cc.getValue(), itemModelMapper.createTabFieldItem(tf.getName(), tf.getTabFieldType().getName(), tabFieldSize, tf.getOrder(), tf.getPlaceholder(), null, null, isCustom));
+                                tabFieldMultiMap.put(tf.getName(), null, cc.getValue(), itemModelMapper.createTabFieldItem(tf.getName(), ((TabField)tf).getTabFieldTypeName(), tabFieldSize, tf.getOrder(), tf.getPlaceholder(), null, null, isCustom));
                             }
                         }
                     } else {
-                        tabFieldMultiMap.put(tf.getName(), null, null, itemModelMapper.createTabFieldItem(tf.getName(), tf.getTabFieldType().getName(), tabFieldSize, tf.getOrder(), tf.getPlaceholder(), null, null, isCustom));
+                        tabFieldMultiMap.put(tf.getName(), null, null, itemModelMapper.createTabFieldItem(tf.getName(), ((TabField)tf).getTabFieldTypeName(), tabFieldSize, tf.getOrder(), tf.getPlaceholder(), null, null, isCustom));
                     }
 
                 } else {
                     if (!tabFieldMultiMap.containsTabField(tf.getName())) {
-                        tabFieldMultiMap.put(tf.getName(), null, null, itemModelMapper.createTabFieldItem(tf.getName(), tf.getTabFieldType().getName(), tabFieldSize, tf.getOrder(), tf.getPlaceholder(), null, null, isCustom));
+                        tabFieldMultiMap.put(tf.getName(), null, null, itemModelMapper.createTabFieldItem(tf.getName(), ((TabField)tf).getTabFieldTypeName(), tabFieldSize, tf.getOrder(), tf.getPlaceholder(), null, null, isCustom));
                     }
                 }
             }

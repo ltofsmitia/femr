@@ -40,6 +40,9 @@ public class PatientEncounterTabField implements IPatientEncounterTabField {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tab_field_id", nullable = false)
     private TabField tabField;
+    private TabFieldSize tabFieldSize;
+    private TabFieldType tabFieldType;
+    private Tab tab;
     @Column(name = "tab_field_value", nullable = false)
     private String tabFieldValue;
     @Column(name = "date_taken", nullable = false)
@@ -90,9 +93,40 @@ public class PatientEncounterTabField implements IPatientEncounterTabField {
         return tabField;
     }
 
+    public String getTabFieldSizeName(){
+        return tabFieldSize.getName();
+    }
+
+    public TabFieldSize getTabFieldSize(){return tabFieldSize;}
+
+    public boolean getTabFieldTabIsCustom(){
+        return tab.getIsCustom();
+    }
+
+    public String getTabFieldTabName(){return tab.getName();}
+
+    public String getTabFieldName(){
+        return tabField.getName();
+    }
+
+    public Integer getTabFieldOrder(){
+        return tabField.getOrder();
+    }
+    public String getTabFieldPlaceholder(){
+        return tabField.getPlaceholder();
+    }
+    public String getTabFieldTypeName()
+    {
+        return tabFieldType.getName();
+    }
+
+
     @Override
     public void setTabField(ITabField tabField) {
         this.tabField = (TabField) tabField;
+        tabFieldSize = ((TabFieldSize)(tabField).getTabFieldSize());
+        tab = (Tab)(tabField.getTab());
+        tabFieldType = (TabFieldType)tabField.getTabFieldType();
     }
 
     @Override
@@ -118,6 +152,10 @@ public class PatientEncounterTabField implements IPatientEncounterTabField {
     @Override
     public ChiefComplaint getChiefComplaint() {
         return chiefComplaint;
+    }
+
+    public String getChiefComplaintValue(){
+        return chiefComplaint.getValue();
     }
 
     @Override

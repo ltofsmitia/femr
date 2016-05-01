@@ -45,6 +45,10 @@ public class PrescriptionItem {
         medicationActiveDrugs = new ArrayList<MedicationItem.ActiveIngredient>();
         this.name = name;
     }
+    public PrescriptionItem(int medicationId, Integer administrationId, int encounterId, int userId, int amount, String specialInstructions)
+    {
+
+    }
 
     public PrescriptionItem() {
         medicationActiveDrugs = new ArrayList<MedicationItem.ActiveIngredient>();

@@ -59,9 +59,9 @@ public class ItemModelMapper implements IItemModelMapper {
      */
     @Override
     public MedicationItem createMedicationItem(IMedication medication, Integer quantityCurrent, Integer quantityTotal, DateTime isDeleted) {
-
+        System.out.println("here!");
         if (medication == null) {
-
+            System.out.println("isNull!");
             return null;
         }
 
@@ -165,10 +165,11 @@ public class ItemModelMapper implements IItemModelMapper {
             return null;
         }
 
-        PatientItem patientItem = new PatientItem();
+        PatientItem patientItem = new PatientItem(id, firstName, lastName, city, address, userId, age, sex, weeksPregnant, heightFeet,heightInches, weight, pathToPatientPhoto, photoId, ageClassification);
+        //PatientItem patientItem = new PatientItem();
 
         //required fields
-        patientItem.setId(id);
+        /*patientItem.setId(id);
         patientItem.setFirstName(firstName);
         patientItem.setLastName(lastName);
         patientItem.setYearsOld(dateUtils.getYearsInteger(age));
@@ -206,7 +207,7 @@ public class ItemModelMapper implements IItemModelMapper {
             patientItem.setHeightInches(0);
 
         if (weight != null)
-            patientItem.setWeight(weight);
+            patientItem.setWeight(weight);*/
 
         return patientItem;
     }

@@ -18,10 +18,7 @@
 */
 package femr.data.models.mysql;
 
-import femr.data.models.core.IMissionCity;
-import femr.data.models.core.IMissionTeam;
-import femr.data.models.core.IMissionTrip;
-import femr.data.models.core.IUser;
+import femr.data.models.core.*;
 
 
 import javax.persistence.*;
@@ -41,6 +38,7 @@ public class MissionTrip implements IMissionTrip {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mission_city_id")
     private MissionCity missionCity;
+    private MissionCountry missionCountry;
     @Column(name = "start_date")
     private Date startDate;
     @Column(name = "end_date")
@@ -61,7 +59,6 @@ public class MissionTrip implements IMissionTrip {
     public IMissionTeam getMissionTeam() {
         return missionTeam;
     }
-
     @Override
     public void setMissionTeam(IMissionTeam missionTeam) {
         this.missionTeam = (MissionTeam) missionTeam;
@@ -75,7 +72,15 @@ public class MissionTrip implements IMissionTrip {
     @Override
     public void setMissionCity(IMissionCity missionCity) {
         this.missionCity = (MissionCity) missionCity;
+        //this.missionC = (MissionCountry) this.missionCity.getMissionCountry();
     }
+    public String getMissionCityName(){return missionCity.getName();}
+    public IMissionCountry getMissionCountry() {
+        return missionCity.getMissionCountry();
+    }
+
+    public String getMissionCountryName() {return missionCity.getMissionCountry().getName();}
+    public String getMissionTeamName() {return missionTeam.getName();}
 
     @Override
     public Date getStartDate() {

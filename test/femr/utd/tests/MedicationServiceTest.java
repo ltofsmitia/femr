@@ -43,7 +43,7 @@ public class MedicationServiceTest extends BaseTest {
         if (newMed != null) {
             //System.out.println("Cleaning!");
             //remove the new medication
-            ServiceResponse<MedicationItem> response2 = service.removeMedication(newMed.getId());
+            ServiceResponse<MedicationItem> response2 = ((MedicationService)service).removeMedication(newMed.getId());
             checkForErrors(response2);
 
             //assert deletion
@@ -55,7 +55,7 @@ public class MedicationServiceTest extends BaseTest {
     @Test
     public void testRetrieveAllMedications() throws Exception {
         //retrieve all the medications
-        ServiceResponse<List<String>> response = service.retrieveAllMedications();
+        ServiceResponse<List<String>> response = ((MedicationService)service).retrieveAllMedications(1);
 
         //check for errors
         checkForErrors(response);
@@ -76,7 +76,23 @@ public class MedicationServiceTest extends BaseTest {
 
     }
 
+    @Test
+    public void testCreatePrescription(){
+        ServiceResponse<PrescriptionItem> response = service.createPrescription(
+                3345, 5, 1575, 76, 5, "(Will it blend?) iphone smoke, don't breate this!"
+        );
+        //checkForErrors(response);
+        PrescriptionItem item = response.getResponseObject();
 
+        boolean a,b,c,d,e,f,g;
+
+        a = item.getMedicationID()==3345;
+        b = item.getAdministrationID() == 5;
+        e = item.getAmount() == 5;
+
+        assert(a&&b&&e);
+
+    }
 
     @Test
     public void testCreateMedication(){
@@ -125,7 +141,7 @@ public class MedicationServiceTest extends BaseTest {
 
         long ans = (long) ((retrieveResponse.getResponseObject().getIsDeleted().booleanValue())? 1 : 0);
 
-        ServiceResponse<MedicationItem> remresponse = service.removeMedication(tempMed.getId());
+        ServiceResponse<MedicationItem> remresponse = ((MedicationService)service).removeMedication(tempMed.getId());
         checkForErrors(remresponse);
 
         //assert deletion

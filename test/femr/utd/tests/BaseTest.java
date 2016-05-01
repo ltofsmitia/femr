@@ -30,9 +30,9 @@ public class BaseTest {
 
         Map<String, Object> conf = conf = new HashMap<>();
 
-        conf.put(  "db.default.url","jdbc:mysql://localhost:3306/femr_testdb");
+        conf.put(  "db.default.url","jdbc:mysql://localhost:3306/testdatabase");
         conf.put(  "db.default.username","root");
-
+        conf.put("play.evolutions.enabled", "false");
 
         //rootroot was the default
         conf.put(  "db.default.password","Qaz1233@1");

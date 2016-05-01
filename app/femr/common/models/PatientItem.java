@@ -18,6 +18,9 @@
 */
 package femr.common.models;
 
+import femr.util.calculations.dateUtils;
+import femr.util.stringhelpers.StringUtils;
+
 import java.util.Date;
 
 public class PatientItem {
@@ -50,6 +53,64 @@ public class PatientItem {
         //default empty values
         this.Id = 0;
         this.pathToPhoto = "";
+    }
+    public PatientItem(int id,
+                       String firstName,
+                       String lastName,
+                       String city,
+                       String address,
+                       int userId,
+                       Date age,
+                       String sex,
+                       Integer weeksPregnant,
+                       Integer heightFeet,
+                       Integer heightInches,
+                       Float weight,
+                       String pathToPatientPhoto,
+                       Integer photoId,
+                       String ageClassification)
+    {
+        Id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        yearsOld = dateUtils.getYearsInteger(age);
+        monthsOld = dateUtils.getMonthsInteger(age);
+        this.city = city;
+        this.userId = userId;
+        //optional fields
+        if (StringUtils.isNotNullOrWhiteSpace(address)) {
+            this.address = address;
+        }
+        if (StringUtils.isNotNullOrWhiteSpace(sex)) {
+            this.sex = sex;
+        }
+        if (age != null) {
+
+            this.age = dateUtils.getAge(age);//age (int)
+            birth = age;//date of birth(date)
+            friendlyDateOfBirth = dateUtils.getFriendlyDate(age);
+
+        }
+        if (StringUtils.isNotNullOrWhiteSpace(pathToPatientPhoto) && photoId != null) {
+
+            pathToPhoto = pathToPatientPhoto;
+            this.photoId =photoId;
+        }
+        if (weeksPregnant != null)
+            this.weeksPregnant = weeksPregnant;
+
+        if (heightFeet != null)
+            this.heightFeet=heightFeet;
+        else
+            this.heightFeet = 0;
+
+        if (heightInches != null)
+            this.heightInches = heightInches;
+        else
+            heightInches =0;
+
+        if (weight != null)
+            this.weight= weight;
     }
 
     public int getId() {

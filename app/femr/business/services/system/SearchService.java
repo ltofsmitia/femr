@@ -447,6 +447,7 @@ public class SearchService implements ISearchService {
         }
 
         String[] words = patientSearchQuery.trim().split(" ");
+
         Integer id = null;
         String firstName = null;
         String lastName = null;
@@ -515,33 +516,7 @@ public class SearchService implements ISearchService {
         //Execute the query
         try {
             List<? extends IPatient> patients = patientRepository.find(query);
-            List<PatientItem> patientItems = new ArrayList<>();
-            for (IPatient patient : patients) {
-                //patientItems.add(DomainMapper.createPatientItem(p, null, null, null, null));
-                String pathToPhoto = null;
-                Integer photoId = null;
-                if (patient.getPhoto() != null) {
-                    pathToPhoto = patient.getPhoto().getFilePath();
-                    photoId = patient.getPhoto().getId();
-                }
-                patientItems.add(itemModelMapper.createPatientItem(
-                        patient.getId(),
-                        patient.getFirstName(),
-                        patient.getLastName(),
-                        patient.getCity(),
-                        patient.getAddress(),
-                        patient.getUserId(),
-                        patient.getAge(),
-                        patient.getSex(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        pathToPhoto,
-                        photoId,
-                        null
-                ));
-            }
+            List<PatientItem> patientItems = getPatientItemList(patients, false);
             response.setResponseObject(patientItems);
         } catch (Exception ex) {
             response.addError("", ex.getMessage());
@@ -621,44 +596,8 @@ public class SearchService implements ISearchService {
                 allPatients = QueryHelper.findPatients(patientRepository);
             }
 
-            List<PatientItem> patientItems = new ArrayList<>();
+            List<PatientItem> patientItems = getPatientItemList(allPatients, true);
 
-            for (IPatient patient : allPatients) {
-
-                String pathToPhoto = null;
-                Integer photoId = null;
-                if (patient.getPhoto() != null) {
-                    pathToPhoto = patient.getPhoto().getFilePath();
-                    photoId = patient.getPhoto().getId();
-                }
-                PatientItem currPatient = itemModelMapper.createPatientItem(
-                        patient.getId(),
-                        patient.getFirstName(),
-                        patient.getLastName(),
-                        patient.getCity(),
-                        patient.getAddress(),
-                        patient.getUserId(),
-                        patient.getAge(),
-                        patient.getSex(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        pathToPhoto,
-                        photoId,
-                        null
-                );
-
-                if (patient.getPhoto() != null) {
-                    currPatient.setPathToPhoto("/photo/patient/" + currPatient.getId() + "?showDefault=false");
-                } else {
-                    // If no photo for patient, show default
-                    currPatient.setPathToPhoto("/photo/patient/" + currPatient.getId() + "?showDefault=true");
-                }
-
-                patientItems.add(currPatient);
-
-            }
 
 
             response.setResponseObject(patientItems);
@@ -804,5 +743,47 @@ public class SearchService implements ISearchService {
             response.addError("exception", ex.getMessage());
         }
         return response;
+    }
+    private List<PatientItem> getPatientItemList(List<? extends IPatient> patients, boolean checkPhotoPath)
+    {
+        List<PatientItem> patientItems = new ArrayList<PatientItem>();
+        for (IPatient patient : patients) {
+
+            String pathToPhoto = null;
+            Integer photoId = null;
+            if (patient.getPhoto() != null) {
+                pathToPhoto = patient.getPhoto().getFilePath();
+                photoId = patient.getPhoto().getId();
+            }
+            PatientItem currPatient = itemModelMapper.createPatientItem(
+                    patient.getId(),
+                    patient.getFirstName(),
+                    patient.getLastName(),
+                    patient.getCity(),
+                    patient.getAddress(),
+                    patient.getUserId(),
+                    patient.getAge(),
+                    patient.getSex(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    pathToPhoto,
+                    photoId,
+                    null
+            );
+            if(checkPhotoPath) {
+                if (patient.getPhoto() != null) {
+                    currPatient.setPathToPhoto("/photo/patient/" + currPatient.getId() + "?showDefault=false");
+                } else {
+                    // If no photo for patient, show default
+                    currPatient.setPathToPhoto("/photo/patient/" + currPatient.getId() + "?showDefault=true");
+                }
+            }
+
+            patientItems.add(currPatient);
+
+        }
+        return patientItems;
     }
 }

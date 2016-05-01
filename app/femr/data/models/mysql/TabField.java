@@ -64,6 +64,16 @@ public class TabField implements ITabField {
         return name;
     }
 
+    public String getTabFieldSizeName()
+    {
+        return tabFieldSize.getName();
+    }
+
+    public String getTabName()
+    {
+        return tab.getName();
+    }
+
     @Override
     public void setName(String name) {
         this.name = name;
@@ -82,6 +92,10 @@ public class TabField implements ITabField {
     @Override
     public ITabFieldType getTabFieldType() {
         return tabFieldType;
+    }
+
+    public String getTabFieldTypeName() {
+        return tabFieldType.getName();
     }
 
     @Override
@@ -122,6 +136,11 @@ public class TabField implements ITabField {
     @Override
     public ITab getTab() {
         return tab;
+    }
+
+    public boolean getTabIsCustom()
+    {
+        return tab.getIsCustom();
     }
 
     @Override

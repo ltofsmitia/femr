@@ -147,34 +147,11 @@ public class ResearchController extends Controller {
             return null;
         }
 
-        ResearchFilterItem filterItem = new ResearchFilterItem();
-
-        filterItem.setPrimaryDataset(filterViewModel.getPrimaryDataset());
-        filterItem.setSecondaryDataset(filterViewModel.getSecondaryDataset());
-        filterItem.setGraphType(filterViewModel.getGraphType());
-        filterItem.setStartDate(filterViewModel.getStartDate());
-        filterItem.setEndDate(filterViewModel.getEndDate());
-
-        Integer groupFactor = filterViewModel.getGroupFactor();
-        filterItem.setGroupFactor(groupFactor);
-        if (groupFactor != null && groupFactor > 0) {
-
-            filterItem.setGroupPrimary(filterViewModel.isGroupPrimary());
-        } else {
-
-            filterItem.setGroupPrimary(false);
-        }
-
-        filterItem.setFilterRangeStart(filterViewModel.getFilterRangeStart());
-        filterItem.setFilterRangeEnd(filterViewModel.getFilterRangeEnd());
-        filterItem.setMedicationName(filterViewModel.getMedicationName());
-        filterItem.setMissionTripId(filterViewModel.getMissionTripId()); //Andrew Trip Filter
-
-
-
+        ResearchFilterItem filterItem = new ResearchFilterItem(filterViewModel);
 
         return filterItem;
     }
+
 
     private ResearchGraphDataModel buildGraphModel(ResearchResultSetItem results) {
 

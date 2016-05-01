@@ -394,7 +394,7 @@ public class MissionTripService implements IMissionTripService {
 
                     IMissionTrip missionTrip = dataModelMapper.createMissionTrip(tripItem.getTripStartDate(), tripItem.getTripEndDate(), missionCity, missionTeam);
                     missionTrip = missionTripRepository.create(missionTrip);
-                    response.setResponseObject(itemModelMapper.createTripItem(missionTrip.getMissionTeam().getName(), missionTrip.getMissionCity().getName(), missionTrip.getMissionCity().getMissionCountry().getName(), missionTrip.getStartDate(), missionTrip.getEndDate()));
+                    response.setResponseObject(itemModelMapper.createTripItem(((MissionTrip)missionTrip).getMissionTeamName(), ((MissionTrip)missionTrip).getMissionCityName(), ((MissionTrip)missionTrip).getMissionCountryName(), missionTrip.getStartDate(), missionTrip.getEndDate()));
 
                 }
             } catch (Exception ex) {
